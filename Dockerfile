@@ -1,6 +1,12 @@
-FROM openjdk:11
-RUN groupadd -r -g 999 ukulele && useradd -rd /opt/ukulele -g ukulele -u 999 -ms /bin/bash ukulele
-COPY --chown=ukulele:ukulele build/libs/ukulele.jar /opt/ukulele/ukulele.jar
-USER ukulele
-WORKDIR /opt/ukulele/
-ENTRYPOINT ["java", "-jar", "/opt/ukulele/ukulele.jar"]
+FROM azul/zulu-openjdk-alpine:11 AS build
+WORKDIR /build
+COPY . .
+RUN sh gradlew --no-daemon build
+
+FROM azul/zulu-openjdk-alpine:11-jre-headless
+RUN apk add --no-cache tini
+WORKDIR /app
+COPY --from=build /build/build/libs/ .
+WORKDIR /data
+VOLUME /data
+ENTRYPOINT ["/sbin/tini", "--", "/usr/bin/java", "-jar","/app/ukulele.jar"]
