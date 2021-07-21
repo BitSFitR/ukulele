@@ -1,11 +1,7 @@
-version: "3.7"
-
+version: "3.9"
 services:
-  ukulele:
-    image: ghcr.io./frederikam/ukulele
-    restart: always
-    environment:
-      CONFIG_DATABASE: ./db/database # Database location overwrite so mounting works
-    volumes:
-      - ./ukulele.yml:/opt/ukulele/ukulele.yml
-      - ./db:/opt/ukulele/db
+    app:
+        image: bitsfitr/ukulele:latest
+        volumes:
+            - /opt/ukulele_data:/data
+            
